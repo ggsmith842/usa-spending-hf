@@ -13,3 +13,4 @@ wheels/
 
 # Env
 .env
+.python-version
