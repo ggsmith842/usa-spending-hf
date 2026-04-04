@@ -1,18 +1,15 @@
 import requests
 import time
-import os 
 
 from pathlib import Path
 from typing import Any
-from dotenv import load_dotenv
 from tqdm import tqdm
-from huggingface_hub import create_bucket, HfFileSystem
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "data" 
 BASE_URL = "https://api.usaspending.gov/"
 
-load_dotenv()
 
 def request_bulk_download(session: requests.Session, payload: dict[str, Any]) -> str:
     url = BASE_URL + "api/v2/bulk_download/awards/"
@@ -41,6 +38,7 @@ def poll_job(session:requests.Session, status_url: str, wait_time: int=10, timeo
         file_url = data.get("file_url")
 
         if status == "finished" and file_url:
+            print("Job finished - file ready for download")
             return file_url
 
         if status == "failed":
@@ -73,33 +71,6 @@ def download_bulk_file(session: requests.Session, file_url: str):
             if chunk:
                 f.write(chunk)
                 pbar.update(len(chunk))
-    
+    print(f"Bulk download written to {output_path}")
     return output_path
 
-def stream_to_hf_bucket(session: requests.Session, file_url:str):
-    #initialize HF parameters
-    HF_TOKEN=os.getenv("HF_TOKEN")
-    HF_NAMESPACE=os.getenv("HF_NAMESPACE")
-    HF_BUCKET_NAME=os.getenv("HF_BUCKET_NAME")
-    file_name = file_url.split("/")[-1]
-
-    fs = HfFileSystem(token=HF_TOKEN)
-    bucket_path = f"hf://buckets/{HF_NAMESPACE}/{HF_BUCKET_NAME}/{file_name}"
-    create_bucket(f"{HF_NAMESPACE}/{HF_BUCKET_NAME}", token=HF_TOKEN, exist_ok=True)
-
-    print(f"Streaming data directly from USAspending to {bucket_path}...")
-
-    zip_stream = session.get(file_url, stream=True)
-    zip_stream.raise_for_status()
-
-    total_size = int(zip_stream.headers.get('content-length', 0))
-    progress_bar = tqdm(total=total_size, unit='iB', unit_scale=True, desc="Uploading")
-
-    with fs.open(bucket_path, "wb") as hf_file:
-        # stream in 5mb chunks 
-        for chunk in zip_stream.iter_content(chunk_size=5*1024*1024):
-            if chunk:
-                hf_file.write(chunk)
-                progress_bar.update(len(chunk))
-    
-    progress_bar.close()
