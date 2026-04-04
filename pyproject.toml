@@ -1,0 +1,13 @@
+[project]
+name = "hf-usa-spending"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "fsspec>=2026.3.0",
+    "huggingface-hub>=1.8.0",
+    "polars>=1.36.1",
+    "python-dotenv>=1.2.2",
+    "requests>=2.32.5",
+]
