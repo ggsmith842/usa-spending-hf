@@ -23,45 +23,21 @@ HF_BUCKET_NAME = os.getenv("HF_BUCKET_NAME")
 
 
 SCHEMA = {
-    # --- identifiers ---
-    "award_id": pl.Utf8,
-    "generated_unique_award_id": pl.Utf8,
-    "recipient_uei": pl.Utf8,
-    "parent_uei": pl.Utf8,
-    "fain": pl.Utf8,
-    "uri": pl.Utf8,
-
-    # --- text ---
+    "award_id_piid": pl.Utf8,
     "recipient_name": pl.Utf8,
-    "recipient_city_name": pl.Utf8,
-    "recipient_state_code": pl.Utf8,
-    "recipient_country_code": pl.Utf8,
-    "recipient_phone_number": pl.Utf8,
-    "award_type": pl.Utf8,
-    "awarding_agency_name": pl.Utf8,
-    "funding_agency_name": pl.Utf8,
-    "recipient_fax_number": pl.Utf8,
-    "parent_award_agency_id": pl.Utf8,
-
-    # --- dangerous numeric-like codes ---
-    "recipient_zip_code": pl.Utf8,
-    "recipient_zip_4_code": pl.Utf8,
-    "cfda_number": pl.Utf8,
-    "naics_code": pl.Utf8,
-    "psc_code": pl.Utf8,
-    "congressional_district": pl.Utf8,
-    "place_of_performance_zip4a": pl.Utf8,
-
-    # --- dates ---
-    "action_date": pl.Date,
+    "recipient_duns": pl.Utf8,
     "period_of_performance_start_date": pl.Date,
     "period_of_performance_current_end_date": pl.Date,
-
-    # --- numeric ---
-    "federal_action_obligation": pl.Float64,
-    "total_obligation": pl.Float64,
-    "total_outlayed_amount": pl.Float64,
-    "base_and_exercised_options_value": pl.Float64,
+    "transaction_description": pl.Utf8,
+    "current_total_value_of_award": pl.Float64,
+    "awarding_agency_name": pl.Utf8,
+    "awarding_sub_agency_name": pl.Utf8,
+    "award_type": pl.Utf8,
+    "award_or_idv_flag": pl.Utf8,
+    "funding_agency_name": pl.Utf8,
+    "funding_sub_agency_name": pl.Utf8,
+    "naics_code": pl.Utf8,
+    "product_or_service_code": pl.Utf8,
 }
 
 def stream_parquet(zip_path):
@@ -101,6 +77,8 @@ def stream_parquet(zip_path):
 def stream_to_hf_bucket(
     session: requests.Session,
     file_url: str,
+    start_dt: str,
+    request_id: str,
     hf_bucket: str = f"{HF_NAMESPACE}/{HF_BUCKET_NAME}",
 ):
     """
@@ -119,10 +97,10 @@ def stream_to_hf_bucket(
         - The bucket is automatically created if it does not already exist.
     """
 
-    file_name = file_url.split("/")[-1]
+    file_name = f"{request_id}_fy{start_dt}_{file_url.split("/")[-1]}"
 
     fs = HfFileSystem(token=HF_TOKEN)
-    bucket_path = f"hf://buckets/{hf_bucket}/{file_name}"
+    bucket_path = f"hf://buckets/{hf_bucket}/raw/{file_name}"
     create_bucket(f"{HF_NAMESPACE}/{HF_BUCKET_NAME}", token=HF_TOKEN, exist_ok=True)
 
     print(f"Streaming data directly from USAspending to {bucket_path}...")
