@@ -10,7 +10,7 @@ from pathlib import Path
 from huggingface_hub import HfFileSystem, create_bucket, batch_bucket_files
 
 # project paths
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 RAW_DIR = PROJECT_ROOT / "data" / "raw"
 TEMP_DIR = PROJECT_ROOT / "data" / "temp"
 

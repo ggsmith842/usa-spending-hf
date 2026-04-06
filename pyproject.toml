@@ -5,8 +5,8 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "datasets>=1.2.1",
-    "fsspec>=2026.3.0",
+    "datasets>=2.18.0", # latest release that aligns with PyArrow 13+ ExtensionType API
+    "fsspec>=2025.10.0,<2026.3.0", # keep below 2026.3 so datasets 2.x+ can install
     "huggingface-hub>=1.8.0",
     "polars>=1.36.1",
     "pyarrow>=23.0.1",

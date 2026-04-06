@@ -2,7 +2,7 @@ import requests
 from src.extract import (
     request_bulk_download,
     poll_job,
-    download_bulk_file,
+    download_bulk_file
 )
 
 from src.upload import stream_parquet, stream_to_hf_bucket
@@ -11,7 +11,7 @@ from src.upload import stream_parquet, stream_to_hf_bucket
 def pipeline():
     print("Starting pipeline")
     fiscal_years = [
-        # ("2021-10-01", "2022-09-30"),
+        ("2021-10-01", "2022-09-30"),
         # ("2022-10-01", "2023-09-30"),
         # ("2023-10-01", "2024-09-30"),
         ("2024-10-01", "2025-09-30"),
@@ -51,7 +51,6 @@ def pipeline():
 
             # stream zip file directly to hf
             stream_to_hf_bucket(session, file_url, start_date, request_id)
-
             # convert to parquet locally then upload to hf buckets
             # zip_path = download_bulk_file(session, file_url)
             # stream_parquet(zip_path)
