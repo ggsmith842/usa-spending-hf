@@ -1,11 +1,10 @@
 import requests
 from src.extract import (
     request_bulk_download,
-    poll_job,
-    download_bulk_file
+    poll_job
 )
 
-from src.upload import stream_parquet, stream_to_hf_bucket
+from src.upload import stream_to_hf_bucket
 
 
 def pipeline():
