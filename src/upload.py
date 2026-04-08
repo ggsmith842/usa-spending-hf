@@ -40,6 +40,7 @@ SCHEMA = {
     "product_or_service_code": pl.Utf8,
 }
 
+
 def stream_parquet(zip_path):
     uploads = []
     bucket_id = f"{HF_NAMESPACE}/{HF_BUCKET_NAME}"
@@ -60,9 +61,7 @@ def stream_parquet(zip_path):
                     shutil.copyfileobj(src, dst, length=8 * 1024 * 1024)
 
                 pl.scan_csv(
-                    csv_tmp,
-                    infer_schema_length=10000,
-                    schema_overrides=SCHEMA
+                    csv_tmp, infer_schema_length=10000, schema_overrides=SCHEMA
                 ).sink_parquet(
                     parquet_tmp,
                     compression="zstd",
@@ -97,7 +96,7 @@ def stream_to_hf_bucket(
         - The bucket is automatically created if it does not already exist.
     """
 
-    file_name = f"{request_id}_fy{start_dt}_{file_url.split("/")[-1]}"
+    file_name = f"{request_id}_fy{start_dt}_{file_url.split('/')[-1]}"
 
     fs = HfFileSystem(token=HF_TOKEN)
     bucket_path = f"hf://buckets/{hf_bucket}/raw/{file_name}"
