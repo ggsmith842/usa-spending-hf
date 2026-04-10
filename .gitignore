@@ -32,3 +32,5 @@ pip-wheel-metadata/
 data/raw/*
 
 *.pyc
+
+data/*/*
